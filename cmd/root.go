@@ -5,11 +5,13 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/aarsad18/go-supplier-otomax/app"
 	"github.com/aarsad18/go-supplier-otomax/resource"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -33,6 +35,7 @@ var startCmd = &cobra.Command{
 	Short: "Start App",
 	Long:  `This is sub-command to start the App.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
 		StartApp()
 	},
 }
@@ -57,6 +60,16 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// setup viper
+	viper.SetConfigName("config") // name of config file (without extension)
+	viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("./")     // path to look for the config file in
+
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
 }
 
 func StartApp() {

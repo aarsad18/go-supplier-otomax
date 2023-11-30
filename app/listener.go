@@ -12,6 +12,7 @@ import (
 	"github.com/aarsad18/go-supplier-otomax/model"
 	"github.com/aarsad18/go-supplier-otomax/resource"
 	"github.com/lib/pq"
+	"github.com/spf13/viper"
 )
 
 type Listener struct {
@@ -30,12 +31,12 @@ func NewListener(db *resource.DBConn) *Listener {
 }
 
 func (ls *Listener) StartListener(db *resource.DBConn) {
-	err := ls.Listener.Listen(CHANNEL)
+	err := ls.Listener.Listen(viper.GetString("NOTIFY_CHANNEL"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Printf("Listening for notifications on channel %s...\n", CHANNEL)
+	log.Printf("Listening for notifications on channel %s...\n", viper.Get("NOTIFY_CHANNEL"))
 
 	// Setup a signal handler to gracefully shutdown the listener
 	sig := make(chan os.Signal, 1)

@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/spf13/viper"
 	postgres "gorm.io/driver/postgres"
 	gorm "gorm.io/gorm"
 )
@@ -15,21 +16,13 @@ type Notification struct {
 	Payload string
 }
 
-const (
-	host     = "172.27.29.121"
-	port     = 5432
-	user     = "pl_pgsupunipin"
-	password = "plus2019link"
-	dbname   = "new_pos_system"
-)
-
 type DBConn struct {
 	DB  *sql.DB
 	Dsn string
 }
 
 func NewDBConn() *DBConn {
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", viper.Get("DB_HOST"), viper.Get("DB_PORT"), viper.Get("DB_USER"), viper.Get("DB_PASS"), viper.Get("DB_NAME"))
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
