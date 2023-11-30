@@ -22,7 +22,7 @@ type DBConn struct {
 }
 
 func NewDBConn() *DBConn {
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", viper.Get("DB_HOST"), viper.Get("DB_PORT"), viper.Get("DB_USER"), viper.Get("DB_PASS"), viper.Get("DB_NAME"))
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", viper.Get("DB_HOST"), viper.GetInt("DB_PORT"), viper.Get("DB_USER"), viper.Get("DB_PASS"), viper.Get("DB_NAME"))
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
