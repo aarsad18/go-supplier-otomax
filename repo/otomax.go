@@ -25,7 +25,7 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 	// Execute the statement
 
 	var (
-		status TrxStatus
+		status model.TrxStatus
 		reffSN string
 		msg    string
 	)
@@ -51,8 +51,8 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 
 		log.Printf("supplier response : %+v\n", stringBody)
 
-		status = PROCESS
-		reffSN = NA
+		status = model.SUCCESS
+		reffSN = model.NA
 		msg = ""
 
 		rgxSuccess := regexp.MustCompile(`success`)
@@ -62,7 +62,7 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 		failedMatch := rgxFailed.FindStringSubmatch(stringBody)
 
 		if len(successMatch) > 0 {
-			status = SUCCESS
+			status = model.SUCCESS
 
 			rgxSn := regexp.MustCompile(`Saldo (?P<SN>.*) \- `)
 			snMatch := rgxSn.FindStringSubmatch(stringBody)
@@ -72,7 +72,7 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 			}
 
 		} else if len(failedMatch) > 0 {
-			status = FAILED
+			status = model.FAILED
 			msg = ""
 		}
 

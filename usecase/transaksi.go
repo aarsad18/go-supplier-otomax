@@ -42,9 +42,9 @@ func (t *TransaksiUsecase) PulsaTrx(payload model.PgNotificationPayload) *model.
 		log.Fatal(err)
 	}
 
-	if oto.Status == repo.SUCCESS {
+	if oto.Status == model.SUCCESS {
 		// update SN
-	} else if oto.Status == repo.FAILED {
+	} else if oto.Status == model.FAILED {
 		// refund saldo
 	}
 

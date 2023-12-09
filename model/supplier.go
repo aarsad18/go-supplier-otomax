@@ -1,7 +1,5 @@
 package model
 
-import "github.com/aarsad18/go-supplier-otomax/repo"
-
 type Supplier struct {
 	ID        string `gorm:"primaryKey"`
 	Name      string `gorm:"column:nama"`
@@ -17,7 +15,7 @@ func (Supplier) TableName() string {
 }
 
 type SupplierResult struct {
-	Status repo.TrxStatus
+	Status TrxStatus
 	SN     string
 	Msg    string
 }
