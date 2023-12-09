@@ -1,3 +1,3 @@
 package app
 
-// const CHANNEL = ""
+const PULSA = "pulsa"

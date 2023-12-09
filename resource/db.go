@@ -17,8 +17,9 @@ type Notification struct {
 }
 
 type DBConn struct {
-	DB  *sql.DB
-	Dsn string
+	DBSql  *sql.DB
+	DBGorm *gorm.DB
+	Dsn    string
 }
 
 func NewDBConn() *DBConn {
@@ -39,7 +40,8 @@ func NewDBConn() *DBConn {
 	sqlDB.SetConnMaxIdleTime(time.Duration(time.Duration.Milliseconds(10000)))
 
 	return &DBConn{
-		DB:  sqlDB,
-		Dsn: dsn,
+		DBSql:  sqlDB,
+		DBGorm: db,
+		Dsn:    dsn,
 	}
 }

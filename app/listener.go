@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -30,7 +31,8 @@ func NewListener(db *resource.DBConn) *Listener {
 	}
 }
 
-func (ls *Listener) StartListener(db *resource.DBConn) {
+func (ls *Listener) StartListener(db *resource.DBConn, services *Services) {
+
 	err := ls.Listener.Listen(viper.GetString("NOTIFY_CHANNEL"))
 	if err != nil {
 		log.Fatal(err)
@@ -47,7 +49,7 @@ func (ls *Listener) StartListener(db *resource.DBConn) {
 		case <-sig:
 			log.Println("Received signal to shutdown. Closing listener and database connection.")
 			ls.Listener.Close()
-			db.DB.Close()
+			db.DBSql.Close()
 			return
 		case notify := <-ls.Listener.Notify:
 			log.Printf("Received notification on channel %s: %v\n", notify.Channel, notify.Extra)
@@ -57,6 +59,10 @@ func (ls *Listener) StartListener(db *resource.DBConn) {
 			err := json.Unmarshal([]byte(notify.Extra), &payload)
 			if err != nil {
 				fmt.Println("Error:", err)
+			}
+
+			if strings.ToLower(payload.ProductCategory) == PULSA {
+				services.UCTransaksi.PulsaTrx(payload)
 			}
 
 			fmt.Printf("%v\n", payload)
