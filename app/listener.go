@@ -33,12 +33,12 @@ func NewListener(db *resource.DBConn) *Listener {
 
 func (ls *Listener) StartListener(db *resource.DBConn, services *Services) {
 
-	err := ls.Listener.Listen(viper.GetString("NOTIFY_CHANNEL"))
+	err := ls.Listener.Listen(viper.GetString(NOTIFY_CHANNEL))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Printf("Listening for notifications on channel %s...\n", viper.Get("NOTIFY_CHANNEL"))
+	log.Printf("Listening for notifications on channel %s...\n", viper.Get(NOTIFY_CHANNEL))
 
 	// Setup a signal handler to gracefully shutdown the listener
 	sig := make(chan os.Signal, 1)

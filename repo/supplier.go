@@ -27,7 +27,5 @@ func (r *SupplierRepo) FindByPK(id string) (*model.Supplier, error) {
 		log.Fatal(err)
 	}
 
-	log.Printf("supplier data: %s\n", supplier)
-
 	return &supplier, err
 }

@@ -16,8 +16,9 @@ func NewServices(db *resource.DBConn) (*Services, error) {
 	repoSupplier := repos.NewSupplierRepo(db)
 	repoTransaction := repos.NewTransactionRepo(db)
 	repoOtomax := repos.NewOtomaxRepo()
+	repoDeposit := repos.NewDepositRepo(db)
 
-	ucTransaksi := ucTransaksi.NewTransaksiUsecase(ucTransaksi.RepoInit{SupplierRepo: repoSupplier, TransactionRepo: repoTransaction, OtomaxRepo: repoOtomax})
+	ucTransaksi := ucTransaksi.NewTransaksiUsecase(ucTransaksi.RepoInit{SupplierRepo: repoSupplier, TransactionRepo: repoTransaction, OtomaxRepo: repoOtomax, DepositRepo: repoDeposit})
 
 	return &Services{UCTransaksi: ucTransaksi}, nil
 }

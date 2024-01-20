@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -30,30 +29,43 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 		msg    string
 	)
 
-	requestURL := fmt.Sprintf("%s/trx?product=%s&dest=%s&refID=%s&memberID=%s&password=%s&pin=%s&qty=1", supplier.Url, trx.SupplierProductCode, trx.CustID, trx.TrxID, supplier.Username, supplier.Signature, supplier.PIN)
+	// requestURL := fmt.Sprintf("%s/trx?product=%s&dest=%s&refID=%s&memberID=%s&password=%s&pin=%s&qty=1", supplier.Url, trx.SupplierProductCode, trx.CustID, trx.TrxID, supplier.Username, supplier.Signature, supplier.PIN)
+
+	requestURL := "http://192.168.17.122:3000/transaction"
+	// requestURL := "http://127.0.0.1:3000/transaction"
+
+	log.Printf("REQUEST: %s\n", requestURL)
 
 	res, err := http.Get(requestURL)
 	if err != nil {
-		fmt.Printf("error making http request: %s\n", err)
+		log.Printf("REQUEST ERROR: %s\n", err)
+		return model.SupplierResult{
+			Status: model.PROCESS,
+			Msg:    err.Error(),
+		}, err
 	}
 
 	defer res.Body.Close()
+
+	status = model.PROCESS
+	reffSN = model.NA
+	msg = ""
 
 	if res.StatusCode == 200 {
 
 		// Read the response body
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
-			fmt.Printf("Error reading response body: %v\n", err)
+			log.Printf("ERROR READING BODY: %v\n", err)
+			return model.SupplierResult{
+				Status: model.PROCESS,
+				Msg:    err.Error(),
+			}, err
 		}
 
 		stringBody := string(body)
 
-		log.Printf("supplier response : %+v\n", stringBody)
-
-		status = model.SUCCESS
-		reffSN = model.NA
-		msg = ""
+		log.Printf("RESPONSE: %+v\n", stringBody)
 
 		rgxSuccess := regexp.MustCompile(`success`)
 		rgxFailed := regexp.MustCompile(`gagal`)
@@ -80,9 +92,8 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 		result.SN = reffSN
 		result.Msg = msg
 
-		log.Printf("result : %+v\n", result)
-
-		return result, err
+	} else {
+		log.Printf("HTTP ERROR [%v]: %s\n", res.StatusCode, err)
 	}
 
 	return result, err

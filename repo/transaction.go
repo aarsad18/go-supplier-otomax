@@ -9,6 +9,7 @@ import (
 
 type ITransactionRepo interface {
 	FindByTrxID(id string) (*model.Transaction, error)
+	UpdateStatusAndSN(trxID string, data model.SupplierResult) error
 }
 
 type TransactionRepo struct {
@@ -27,7 +28,16 @@ func (r *TransactionRepo) FindByTrxID(id string) (*model.Transaction, error) {
 		log.Fatal(err)
 	}
 
-	log.Printf("transaction data: %s\n", transaction)
-
 	return &transaction, err
+}
+
+func (r *TransactionRepo) UpdateStatusAndSN(trxID string, data model.SupplierResult) error {
+	// Execute the statement
+	dataUpdate := map[string]interface{}{"status": data.Status, "reff_sn": data.SN}
+	err := r.db.DBGorm.Where("trx_id = ?", trxID).Updates(dataUpdate).Error
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return err
 }

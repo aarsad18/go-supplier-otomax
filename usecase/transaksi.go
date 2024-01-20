@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/aarsad18/go-supplier-otomax/model"
@@ -16,6 +15,7 @@ type RepoInit struct {
 	SupplierRepo    repo.ISupplierRepo
 	TransactionRepo repo.ITransactionRepo
 	OtomaxRepo      repo.IOtomaxRepo
+	DepositRepo     repo.IDepositRepo
 }
 
 type TransaksiUsecase struct {
@@ -29,26 +29,34 @@ func NewTransaksiUsecase(repo RepoInit) *TransaksiUsecase {
 func (t *TransaksiUsecase) PulsaTrx(payload model.PgNotificationPayload) *model.Transaction {
 	supplier, err := t.repo.SupplierRepo.FindByPK(payload.SupplierID)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	transaction, err := t.repo.TransactionRepo.FindByTrxID(payload.TrxID)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	oto, err := t.repo.OtomaxRepo.RequestTransaction(*supplier, *transaction)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
-	if oto.Status == model.SUCCESS {
-		// update SN
-	} else if oto.Status == model.FAILED {
-		// refund saldo
+	err = t.repo.TransactionRepo.UpdateStatusAndSN(transaction.TrxID, oto)
+	if err != nil {
+		log.Print(err)
 	}
 
-	fmt.Println(oto)
+	if oto.Status == model.FAILED {
+		log.Print("transaction failed")
+		err := t.repo.DepositRepo.RefundSaldo(*transaction)
+		if err != nil {
+			log.Printf("Error refund saldo: %s", err)
+		}
+		log.Print("sukses refund saldo")
+	} else {
+		log.Printf("status transaksi %s", oto.Status)
+	}
 
 	return transaction
 }
