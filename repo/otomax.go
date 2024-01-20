@@ -67,8 +67,14 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 
 		log.Printf("RESPONSE: %+v\n", stringBody)
 
-		rgxSuccess := regexp.MustCompile(`success`)
-		rgxFailed := regexp.MustCompile(`gagal`)
+		rgxSuccess, err := regexp.Compile(`success`)
+		if err != nil {
+			log.Printf("error compile rgxSuccess: %s\n", err)
+		}
+		rgxFailed, err := regexp.Compile(`gagal`)
+		if err != nil {
+			log.Printf("error compile rgxFailed: %s\n", err)
+		}
 
 		successMatch := rgxSuccess.FindStringSubmatch(stringBody)
 		failedMatch := rgxFailed.FindStringSubmatch(stringBody)
@@ -76,7 +82,10 @@ func (r *OtomaxRepo) RequestTransaction(supplier model.Supplier, trx model.Trans
 		if len(successMatch) > 0 {
 			status = model.SUCCESS
 
-			rgxSn := regexp.MustCompile(`Saldo (?P<SN>.*) \- `)
+			rgxSn, err := regexp.Compile(`Saldo (?P<SN>.*) \- `)
+			if err != nil {
+				log.Printf("error compile regexSn: %s\n", err)
+			}
 			snMatch := rgxSn.FindStringSubmatch(stringBody)
 			if len(snMatch) > 0 {
 				sn := rgxSn.SubexpIndex("SN")
